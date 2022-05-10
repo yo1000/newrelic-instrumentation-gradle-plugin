@@ -1,0 +1,26 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+}
+
+group 'com.yo1000'
+version '1.0.0'
+sourceCompatibility = 8
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = 'com.yo1000.newrelic-instrumentation'
+            implementationClass = 'com.yo1000.nrinstrg.NewRelicInstrumentationPlugin'
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.ow2.asm:asm:9.3'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
