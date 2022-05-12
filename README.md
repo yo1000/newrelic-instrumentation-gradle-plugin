@@ -12,7 +12,7 @@ Configure plugins section in build.gradle file.
 
 ```groovy
 plugins {
-    id 'com.yo1000.newrelic-instrumentation' version '1.0.0'
+    id 'com.yo1000.newrelic-instrumentation' version '1.0.1'
 }
 
 newrelicInstrumentation {

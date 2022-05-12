@@ -3,7 +3,6 @@ package com.yo1000.nrinstrg;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.MapProperty;
@@ -272,7 +271,7 @@ public class NewRelicInstrumentationPlugin implements Plugin<Project> {
 
         @Override
         public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-            if (!name.equals("<init>")) methodNames.add(new MethodName(name));
+            if (!name.equals("<init>") && !name.equals("<clinit>")) methodNames.add(new MethodName(name));
             return super.visitMethod(access, name, desc, signature, exceptions);
         }
 
