@@ -35,9 +35,22 @@ public class NewRelicInstrumentationPlugin implements Plugin<Project> {
         Property<String> getVersion(); // "1.0";
         Property<Boolean> getEnabled(); // true;
         MapProperty<String, String> getManuallyDefinitions();
+        Property<String> getAsm(); // "9";
     }
 
     private static final Logger logger = Logging.getLogger(NewRelicInstrumentationPlugin.class);
+
+    private static final String ASM_DEFAULT = "9";
+
+    private static final Map<String, Integer> APIS = Collections.unmodifiableMap(new HashMap<String, Integer>() {{
+        put("5", Opcodes.ASM5);
+        put("6", Opcodes.ASM6);
+        put("7", Opcodes.ASM7);
+        put("8", Opcodes.ASM8);
+        put("9", Opcodes.ASM9);
+    }});
+
+    private static final int API_DEFAULT = APIS.get(ASM_DEFAULT);
 
     @Override
     public void apply(final Project project) {
@@ -51,8 +64,8 @@ public class NewRelicInstrumentationPlugin implements Plugin<Project> {
         });
     }
 
-    protected Map.Entry<ClassName, MethodNames> visitClassFile(File f) throws IOException {
-        final ClassMethodCapturingVisitor visitor = new ClassMethodCapturingVisitor();
+    protected Map.Entry<ClassName, MethodNames> visitClassFile(int api, File f) throws IOException {
+        final ClassMethodCapturingVisitor visitor = new ClassMethodCapturingVisitor(api);
 
         try (InputStream in = new FileInputStream(f)) {
             new ClassReader(in).accept(visitor, ClassReader.SKIP_FRAMES);
@@ -63,7 +76,7 @@ public class NewRelicInstrumentationPlugin implements Plugin<Project> {
         return new AbstractMap.SimpleEntry<>(visitor.getClassName(), visitor.getMethodNames());
     }
 
-    protected ClassNameMappedMethodNames walkClassesDirectory(File directory) throws IOException {
+    protected ClassNameMappedMethodNames walkClassesDirectory(int api, File directory) throws IOException {
         final ClassNameMappedMethodNames map = new ClassNameMappedMethodNames();
 
         Files.walkFileTree(directory.toPath(), new SimpleFileVisitor<Path>() {
@@ -74,7 +87,7 @@ public class NewRelicInstrumentationPlugin implements Plugin<Project> {
                 if (!f.getName().toLowerCase().endsWith(".class"))
                     return FileVisitResult.CONTINUE;
 
-                map.put(visitClassFile(f));
+                map.put(visitClassFile(api, f));
 
                 return super.visitFile(file, attrs);
             }
@@ -90,11 +103,13 @@ public class NewRelicInstrumentationPlugin implements Plugin<Project> {
         final String name = extension.getName().getOrElse("newrelic-extension");
         final String version = extension.getVersion().getOrElse("1.0");
         final Boolean enabled = extension.getEnabled().getOrElse(true);
+        final String asm = extension.getAsm().getOrElse(ASM_DEFAULT);
+        final int api = APIS.get(asm) != null ? APIS.get(asm) : API_DEFAULT;
 
         if (!outputDirectory.exists() || !outputDirectory.isDirectory()) return;
 
         try {
-            ClassNameMappedMethodNames map = walkClassesDirectory(outputDirectory);
+            ClassNameMappedMethodNames map = walkClassesDirectory(api, outputDirectory);
 
             manuallyDefinitions.forEach((classNameString, methodNameAsSpaceSeparatedString) -> {
                 ClassName className = new ClassName(classNameString.replace('-', '$'));
@@ -259,8 +274,8 @@ public class NewRelicInstrumentationPlugin implements Plugin<Project> {
         private ClassName className;
         private final MethodNames methodNames = new MethodNames();
 
-        ClassMethodCapturingVisitor() {
-            super(Opcodes.ASM5);
+        ClassMethodCapturingVisitor(int api) {
+            super(api);
         }
 
         @Override
