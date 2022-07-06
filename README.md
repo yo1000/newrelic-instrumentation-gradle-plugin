@@ -12,7 +12,7 @@ Configure plugins section in build.gradle file.
 
 ```groovy
 plugins {
-    id 'com.yo1000.newrelic-instrumentation' version '1.0.1'
+    id 'com.yo1000.newrelic-instrumentation' version '1.0.2'
 }
 
 newrelicInstrumentation {
@@ -21,6 +21,7 @@ newrelicInstrumentation {
     name = 'newrelic-extension'
     version = '1.0'
     enabled = true
+    asm = '9'
 }
 ```
 
@@ -79,8 +80,12 @@ newrelicInstrumentation {
     manuallyDefinitions.put('java.util.ArrayList', 'get add set')
     manuallyDefinitions.put('com.yo1000.demo.ExampleList', 'get add set')
     manuallyDefinitions.put('com.yo1000.demo.Foo-Bar', 'baz')
+    asm = '9'
 }
 ```
+
+#### asm
+ASM API version. Can choose from `5`, `6`, `7`, `8`, `9`.
 
 ## How to Build
 Install to Maven local repository.
