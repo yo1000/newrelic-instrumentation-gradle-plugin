@@ -1,18 +1,25 @@
-# newrelic-instrumentation-gradle-plugin
+newrelic-instrumentation-gradle-plugin
+================================================================================
 
 Plugin that automatically creates XML file for NewRelic custom instrumentation for Gradle.
 
 refs: https://docs.newrelic.com/docs/agents/java-agent/custom-instrumentation/java-instrumentation-xml
 
-## Requirements
-* JDK8+
 
-## Usage
+Requirements
+--------------------------------------------------------------------------------
+
+* Java 8+
+
+
+Usage
+--------------------------------------------------------------------------------
+
 Configure plugins section in build.gradle file.
 
 ```groovy
 plugins {
-    id 'com.yo1000.newrelic-instrumentation' version '1.0.2'
+    id 'com.yo1000.newrelic-instrumentation' version '1.0.3'
 }
 
 newrelicInstrumentation {
@@ -44,25 +51,32 @@ cat build/newrelic-instrumentation/extensions/newrelic-extension.xml
 ```
 
 ### Configuration parameters
+
 Configurable parameters are follows.
 
 #### outputDirectory
+
 Compiled class files location.
 
 #### namespaceUri
+
 XML namespace.
 
 #### name
+
 Custom instrumentation XML file name.
 
 #### version
+
 Custom instrumentation XML version.
 If any same named instrumentation XML, only enable to have the latest version.
 
 #### enabled
+
 Enable Custom instrumentation XML.
 
 #### manuallyDefinitions
+
 Custom instrumentation additional pointcut configs by manually.
 Method definition separator is space characters. (e.g., ` `, `\t`, `\n`)
 Inner class name separator is not `$`, use be `-`.
@@ -85,9 +99,13 @@ newrelicInstrumentation {
 ```
 
 #### asm
+
 ASM API version. Can choose from `5`, `6`, `7`, `8`, `9`.
 
-## How to Build
+
+How to Build
+--------------------------------------------------------------------------------
+
 Install to Maven local repository.
 
 ```
